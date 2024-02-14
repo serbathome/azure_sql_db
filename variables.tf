@@ -41,6 +41,12 @@ variable "enable_elastic_pool" {
   default     = false
 }
 
+variable "enable_reporting_replica" {
+  description = "Whether to enable a reporting replica for the SQL Server"
+  type        = bool
+  default     = false
+}
+
 variable "databases" {
   description = "A list of databases to create"
   type = list(object({
