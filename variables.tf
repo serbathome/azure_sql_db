@@ -29,11 +29,26 @@ variable "password" {
   default     = "Password1234!"
 }
 
+variable "enable_dr_site" {
+  description = "Whether to enable geo-replication for the SQL Server"
+  type        = bool
+  default     = false
+}
+
+variable "enable_elastic_pool" {
+  description = "Whether to enable an elastic pool for the SQL Server"
+  type        = bool
+  default     = false
+}
+
 variable "databases" {
   description = "A list of databases to create"
   type = list(object({
-    name      = string
-    collation = string
+    name            = string
+    collation       = string
+    is_elastic_pool = bool
   }))
   default = []
 }
+
+

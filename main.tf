@@ -15,6 +15,7 @@ resource "azurerm_mssql_server" "primary-sqlserver" {
 }
 
 resource "azurerm_mssql_elasticpool" "pool" {
+  count               = var.enable_elastic_pool ? 1 : 0
   name                = "mypool"
   resource_group_name = azurerm_resource_group.primary_group.name
   location            = azurerm_resource_group.primary_group.location
@@ -36,7 +37,8 @@ resource "azurerm_mssql_database" "db" {
   name            = var.databases[count.index].name
   collation       = var.databases[count.index].collation
   server_id       = azurerm_mssql_server.primary-sqlserver.id
-  elastic_pool_id = azurerm_mssql_elasticpool.pool.id
+  elastic_pool_id = var.enable_elastic_pool && var.databases[count.index].is_elastic_pool ? azurerm_mssql_elasticpool.pool[0].id : null
+  #  elastic_pool_id = azurerm_mssql_elasticpool.pool.id
 }
 
 # DR region
@@ -56,6 +58,7 @@ resource "azurerm_mssql_server" "secondary-sqlserver" {
 }
 
 resource "azurerm_mssql_elasticpool" "secondary_pool" {
+  count               = var.enable_elastic_pool ? 1 : 0
   name                = "mypool"
   resource_group_name = azurerm_resource_group.secondary_group.name
   location            = azurerm_resource_group.secondary_group.location
@@ -99,6 +102,7 @@ resource "azurerm_mssql_server" "read-replica" {
 }
 
 resource "azurerm_mssql_elasticpool" "read-replica-pool" {
+  count               = var.enable_elastic_pool ? 1 : 0
   name                = "mypool-replica"
   resource_group_name = azurerm_resource_group.primary_group.name
   location            = azurerm_resource_group.primary_group.location
@@ -122,6 +126,7 @@ resource "azurerm_mssql_database" "read-replica-db" {
   name                        = "${var.databases[count.index].name}-replica"
   collation                   = var.databases[count.index].collation
   server_id                   = azurerm_mssql_server.read-replica.id
-  elastic_pool_id             = azurerm_mssql_elasticpool.read-replica-pool.id
-  depends_on                  = [azurerm_mssql_database.db]
+  elastic_pool_id             = var.enable_elastic_pool && var.databases[count.index].is_elastic_pool ? azurerm_mssql_elasticpool.read-replica-pool[0].id : null
+  #  elastic_pool_id             = azurerm_mssql_elasticpool.read-replica-pool.id
+  depends_on = [azurerm_mssql_database.db]
 }
