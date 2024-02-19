@@ -1,3 +1,12 @@
+# Random values
+resource "random_string" "random" {
+  numeric = true
+  upper   = false
+  special = false
+  lower   = true
+  length  = 5
+}
+
 # Pimary region
 
 resource "azurerm_resource_group" "primary_group" {
@@ -6,7 +15,7 @@ resource "azurerm_resource_group" "primary_group" {
 }
 
 resource "azurerm_mssql_server" "primary-sqlserver" {
-  name                         = "myserver-92348612"
+  name                         = "sql-server-primary-${random_string.random.result}"
   resource_group_name          = azurerm_resource_group.primary_group.name
   location                     = azurerm_resource_group.primary_group.location
   version                      = "12.0"
@@ -50,7 +59,7 @@ resource "azurerm_resource_group" "secondary_group" {
 
 resource "azurerm_mssql_server" "secondary-sqlserver" {
   count                        = var.enable_dr_site ? 1 : 0
-  name                         = "myserver-92348613"
+  name                         = "sql-server-secondary-${random_string.random.result}"
   resource_group_name          = azurerm_resource_group.secondary_group[0].name
   location                     = azurerm_resource_group.secondary_group[0].location
   version                      = "12.0"
@@ -95,7 +104,7 @@ resource "azurerm_mssql_failover_group" "failover" {
 # Local server with a read replica
 resource "azurerm_mssql_server" "read-replica" {
   count                        = var.enable_reporting_replica ? 1 : 0
-  name                         = "myserver-92348614"
+  name                         = "sql-server-replica-${random_string.random.result}"
   resource_group_name          = azurerm_resource_group.primary_group.name
   location                     = azurerm_resource_group.primary_group.location
   version                      = "12.0"
