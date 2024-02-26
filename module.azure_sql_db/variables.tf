@@ -50,7 +50,7 @@ variable "enable_reporting_replica" {
 variable "elastic_pool_sku_name" {
   description = "The sku name of the elastic pool"
   type        = string
-  default     = "Standard"
+  default     = "StandardPool"
 }
 
 variable "elastic_pool_sku_tier" {
@@ -82,11 +82,13 @@ variable "elastic_pool_per_database_settings" {
     max_capacity = 20
   }
 }
+
 variable "allowed_ips" {
-  description = "List of IP addresses to allow to connect to the SQL Server in format [start_ip, end_ip]"
+  description = "List of IP addresses to allow to connect to the SQL Server"
   type        = list(list(string))
   default     = []
 }
+
 variable "databases" {
   description = "A list of databases to create"
   type = list(object({
